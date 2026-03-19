@@ -709,15 +709,15 @@ class AnnotationEditor(QMainWindow):
             self._scene.addItem(self._current_item)
 
         elif self._current_tool == Tool.RECTANGLE:
-            self._current_item = QGraphicsRectItem(QRectF(pos, pos))
+            self._current_item = QGraphicsRectItem(pos.x(), pos.y(), 0, 0)
             self._current_item.setPen(pen)
-            self._current_item.setBrush(Qt.BrushStyle.NoBrush)
+            self._current_item.setBrush(QBrush(Qt.BrushStyle.NoBrush))
             self._scene.addItem(self._current_item)
 
         elif self._current_tool == Tool.ELLIPSE:
-            self._current_item = QGraphicsEllipseItem(QRectF(pos, pos))
+            self._current_item = QGraphicsEllipseItem(pos.x(), pos.y(), 0, 0)
             self._current_item.setPen(pen)
-            self._current_item.setBrush(Qt.BrushStyle.NoBrush)
+            self._current_item.setBrush(QBrush(Qt.BrushStyle.NoBrush))
             self._scene.addItem(self._current_item)
 
         elif self._current_tool == Tool.LINE:
@@ -747,13 +747,13 @@ class AnnotationEditor(QMainWindow):
                 self._has_annotations = True
 
         elif self._current_tool == Tool.BLUR:
-            self._current_item = QGraphicsRectItem(QRectF(pos, pos))
+            self._current_item = QGraphicsRectItem(pos.x(), pos.y(), 0, 0)
             self._current_item.setPen(QPen(QColor(100, 100, 255, 150), 2, Qt.PenStyle.DashLine))
             self._current_item.setBrush(QBrush(QColor(100, 100, 255, 30)))
             self._scene.addItem(self._current_item)
 
         elif self._current_tool == Tool.HIGHLIGHT:
-            self._current_item = QGraphicsRectItem(QRectF(pos, pos))
+            self._current_item = QGraphicsRectItem(pos.x(), pos.y(), 0, 0)
             highlight_color = QColor(self._pen_color)
             highlight_color.setAlpha(60)
             self._current_item.setPen(QPen(Qt.PenStyle.NoPen))
@@ -777,10 +777,12 @@ class AnnotationEditor(QMainWindow):
             self._current_item.setLine(QLineF(self._start_pos, pos))
         elif self._current_tool == Tool.LINE:
             self._current_item.setLine(QLineF(self._start_pos, pos))
-        elif self._current_tool in (Tool.RECTANGLE, Tool.BLUR, Tool.HIGHLIGHT):
-            self._current_item.setRect(QRectF(self._start_pos, pos).normalized())
-        elif self._current_tool == Tool.ELLIPSE:
-            self._current_item.setRect(QRectF(self._start_pos, pos).normalized())
+        elif self._current_tool in (Tool.RECTANGLE, Tool.BLUR, Tool.HIGHLIGHT, Tool.ELLIPSE):
+            x1, y1 = self._start_pos.x(), self._start_pos.y()
+            x2, y2 = pos.x(), pos.y()
+            self._current_item.setRect(QRectF(
+                min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1)
+            ))
         elif self._current_tool == Tool.FREEHAND:
             self._path_points.append(pos)
             path = QPainterPath()
