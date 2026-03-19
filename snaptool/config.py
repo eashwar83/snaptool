@@ -27,6 +27,9 @@ DEFAULT_CONFIG = {
     "last_save_dir": "",
     "auto_cleanup_enabled": False,
     "auto_cleanup_days": 30,
+    "editor_tool": "ARROW",
+    "editor_color": "#ff3232",
+    "editor_width": 3,
 }
 
 
