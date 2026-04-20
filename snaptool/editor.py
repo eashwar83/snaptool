@@ -18,7 +18,7 @@ from PyQt6.QtCore import Qt, QPointF, QRectF, QLineF, QEvent, QSize
 from PyQt6.QtGui import (
     QPainter, QColor, QPen, QBrush, QPixmap, QFont, QPainterPath,
     QPolygonF, QImage, QIcon, QTransform, QAction, QActionGroup,
-    QCloseEvent,
+    QCloseEvent, QKeySequence,
 )
 
 from .config import Config
@@ -545,55 +545,64 @@ class AnnotationEditor(QMainWindow):
 
         toolbar.addSeparator()
 
+        def _register(action, shortcuts):
+            """Attach shortcuts with window-wide context and register with the main window."""
+            if shortcuts:
+                keys = shortcuts if isinstance(shortcuts, list) else [shortcuts]
+                action.setShortcuts([QKeySequence(k) for k in keys])
+                action.setShortcutContext(Qt.ShortcutContext.WindowShortcut)
+            self.addAction(action)
+
         undo_action = QAction(_make_undo_icon(), "Undo", self)
         undo_action.setToolTip("Undo (Ctrl+Z)")
-        undo_action.setShortcut("Ctrl+Z")
         undo_action.triggered.connect(self._undo)
+        _register(undo_action, "Ctrl+Z")
         toolbar.addAction(undo_action)
 
         redo_action = QAction(_make_redo_icon(), "Redo", self)
         redo_action.setToolTip("Redo (Ctrl+Y)")
-        redo_action.setShortcut("Ctrl+Y")
         redo_action.triggered.connect(self._redo)
+        _register(redo_action, ["Ctrl+Y", "Ctrl+Shift+Z"])
         toolbar.addAction(redo_action)
 
         toolbar.addSeparator()
 
         zoom_in = QAction(_make_zoom_in_icon(), "Zoom In", self)
         zoom_in.setToolTip("Zoom In (Ctrl+=)")
-        zoom_in.setShortcut("Ctrl+=")
         zoom_in.triggered.connect(lambda: self._view.scale(1.2, 1.2))
+        _register(zoom_in, ["Ctrl+=", "Ctrl++"])
         toolbar.addAction(zoom_in)
 
         zoom_out = QAction(_make_zoom_out_icon(), "Zoom Out", self)
         zoom_out.setToolTip("Zoom Out (Ctrl+-)")
-        zoom_out.setShortcut("Ctrl+-")
         zoom_out.triggered.connect(lambda: self._view.scale(1 / 1.2, 1 / 1.2))
+        _register(zoom_out, ["Ctrl+-", "Ctrl+_"])
         toolbar.addAction(zoom_out)
 
         zoom_fit = QAction(_make_fit_icon(), "Fit", self)
         zoom_fit.setToolTip("Fit to Window (Ctrl+0)")
-        zoom_fit.setShortcut("Ctrl+0")
         zoom_fit.triggered.connect(self._fit_view)
+        _register(zoom_fit, "Ctrl+0")
         toolbar.addAction(zoom_fit)
 
         toolbar.addSeparator()
 
         save_action = QAction(_make_save_icon(), "Save", self)
         save_action.setToolTip("Save (Ctrl+S)")
-        save_action.setShortcut("Ctrl+S")
         save_action.triggered.connect(self._save)
+        _register(save_action, "Ctrl+S")
         toolbar.addAction(save_action)
 
         save_copy_path_action = QAction(_make_save_copy_path_icon(), "Save + Copy Path", self)
-        save_copy_path_action.setToolTip("Save + Copy Path")
+        save_copy_path_action.setToolTip("Save + Copy Path (Ctrl+Shift+S)")
         save_copy_path_action.triggered.connect(self._save_copy_path)
+        _register(save_copy_path_action, "Ctrl+Shift+S")
         toolbar.addAction(save_copy_path_action)
 
         copy_action = QAction(_make_copy_icon(), "Copy", self)
         copy_action.setToolTip("Copy to Clipboard (Ctrl+C)")
-        copy_action.setShortcut("Ctrl+C")
         copy_action.triggered.connect(self._copy_to_clipboard)
+        _register(copy_action, "Ctrl+C")
         toolbar.addAction(copy_action)
 
     def _apply_style(self):
