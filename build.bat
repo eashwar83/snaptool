@@ -20,13 +20,12 @@ py -m PyInstaller ^
     --windowed ^
     --name SnapTool ^
     --hidden-import mss ^
-    --hidden-import keyboard ^
     --hidden-import PIL ^
     --hidden-import snaptool ^
     --hidden-import snaptool.app ^
     --hidden-import snaptool.capture ^
     --hidden-import snaptool.config ^
-    --hidden-import snaptool.dialogs ^
+    --hidden-import snaptool.hotkeys ^
     --hidden-import snaptool.editor ^
     --hidden-import snaptool.save_dialog ^
     --hidden-import snaptool.settings_dialog ^

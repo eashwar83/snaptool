@@ -177,7 +177,7 @@ class SettingsDialog(QDialog):
 
         hint = QLabel(
             "Format: ctrl+shift+s, alt+print screen, etc.\n"
-            "Restart required for hotkey changes to take effect."
+            "Changes apply after pressing OK. Avoid Windows-reserved shortcuts."
         )
         hint.setStyleSheet("color: #888; font-size: 8pt;")
         layout.addRow("", hint)

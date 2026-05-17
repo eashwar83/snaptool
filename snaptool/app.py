@@ -20,6 +20,7 @@ from .save_dialog import SaveDialog
 from .editor import AnnotationEditor
 from .settings_dialog import SettingsDialog
 from .history import HistoryDialog
+from .hotkeys import NativeHotkeyManager
 
 
 class HotkeySignals(QObject):
@@ -100,9 +101,14 @@ class SnapToolApp(QObject):
         self._region_selector.region_selected.connect(self._on_capture)
         self._region_selector.selection_cancelled.connect(self._on_cancel)
         self._hotkey_signals = HotkeySignals()
+        self._hotkey_signals.fullscreen.connect(self._capture_fullscreen)
+        self._hotkey_signals.region.connect(self._capture_region)
+        self._hotkey_signals.window.connect(self._capture_window)
+        self._hotkey_signals.delayed.connect(self._capture_delayed)
         self._pin_windows = []
         self._editors = []
         self._tray = None
+        self._hotkey_manager = NativeHotkeyManager()
         self._countdown_timer = None
         self._countdown_remaining = 0
         self._countdown_window = None
@@ -140,6 +146,9 @@ class SnapToolApp(QObject):
         return QIcon(pixmap)
 
     def _setup_tray(self):
+        if self._tray is not None:
+            self._tray.hide()
+
         self._tray = QSystemTrayIcon(self._create_icon())
         self._tray.setToolTip("SnapTool - Screenshot Tool")
 
@@ -194,16 +203,10 @@ class SnapToolApp(QObject):
         self._tray.show()
 
     def _setup_hotkeys(self):
-        try:
-            import keyboard
-        except ImportError:
-            print("Warning: 'keyboard' package not installed. Global hotkeys disabled.")
+        self._hotkey_manager.unregister_all()
+        if not self._hotkey_manager.available:
+            print("Warning: Native global hotkeys are only available on Windows.")
             return
-
-        self._hotkey_signals.fullscreen.connect(self._capture_fullscreen)
-        self._hotkey_signals.region.connect(self._capture_region)
-        self._hotkey_signals.window.connect(self._capture_window)
-        self._hotkey_signals.delayed.connect(self._capture_delayed)
 
         hotkeys = self.config.get("hotkeys", {})
         bindings = {
@@ -217,7 +220,7 @@ class SnapToolApp(QObject):
             combo = hotkeys.get(action, "")
             if combo:
                 try:
-                    keyboard.add_hotkey(combo, signal.emit, suppress=False)
+                    self._hotkey_manager.register(combo, signal.emit)
                 except Exception as e:
                     print(f"Warning: Could not register hotkey '{combo}' for {action}: {e}")
 
@@ -332,12 +335,6 @@ class SnapToolApp(QObject):
     def _show_settings(self):
         dialog = SettingsDialog()
         if dialog.exec():
-            # Re-register hotkeys
-            try:
-                import keyboard
-                keyboard.unhook_all()
-            except Exception:
-                pass
             self._setup_hotkeys()
             # Rebuild tray menu to reflect new shortcuts
             self._setup_tray()
@@ -391,11 +388,7 @@ class SnapToolApp(QObject):
                     pass
 
     def _quit(self):
-        try:
-            import keyboard
-            keyboard.unhook_all()
-        except Exception:
-            pass
+        self._hotkey_manager.close()
 
         for pin in self._pin_windows:
             pin.close()
