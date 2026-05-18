@@ -1,17 +1,33 @@
 """SnapTool - Professional Screenshot Application for Windows."""
 
 import sys
-import os
 
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import Qt
+
+
+def _set_windows_app_id():
+    if sys.platform != "win32":
+        return
+
+    try:
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+            "SnapTool.ScreenshotTool"
+        )
+    except Exception:
+        pass
 
 
 def main():
+    _set_windows_app_id()
+
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
     app.setApplicationName("SnapTool")
     app.setOrganizationName("SnapTool")
+
+    from snaptool.icons import create_app_icon
+    app.setWindowIcon(create_app_icon())
 
     # Prevent multiple instances
     from PyQt6.QtCore import QSharedMemory

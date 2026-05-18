@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QTimer, QObject, pyqtSignal, QSize, QPoint
 from PyQt6.QtGui import (
-    QPixmap, QPainter, QColor, QFont, QIcon, QCursor, QAction,
+    QFont, QCursor,
 )
 
 from .config import Config
@@ -21,6 +21,7 @@ from .editor import AnnotationEditor
 from .settings_dialog import SettingsDialog
 from .history import HistoryDialog
 from .hotkeys import NativeHotkeyManager
+from .icons import create_app_icon
 
 
 class HotkeySignals(QObject):
@@ -119,37 +120,11 @@ class SnapToolApp(QObject):
         self._auto_cleanup()
         self._show_welcome()
 
-    def _create_icon(self):
-        pixmap = QPixmap(64, 64)
-        pixmap.fill(Qt.GlobalColor.transparent)
-        p = QPainter(pixmap)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-
-        p.setBrush(QColor(0, 122, 204))
-        p.setPen(Qt.PenStyle.NoPen)
-        p.drawRoundedRect(4, 14, 56, 42, 8, 8)
-        p.drawRoundedRect(20, 6, 20, 12, 4, 4)
-
-        p.setBrush(QColor(240, 240, 240))
-        p.drawEllipse(18, 22, 28, 28)
-
-        p.setBrush(QColor(0, 90, 158))
-        p.drawEllipse(24, 28, 16, 16)
-
-        p.setBrush(QColor(255, 255, 255, 120))
-        p.drawEllipse(28, 30, 6, 6)
-
-        p.setBrush(QColor(255, 220, 50))
-        p.drawEllipse(46, 18, 8, 8)
-
-        p.end()
-        return QIcon(pixmap)
-
     def _setup_tray(self):
         if self._tray is not None:
             self._tray.hide()
 
-        self._tray = QSystemTrayIcon(self._create_icon())
+        self._tray = QSystemTrayIcon(create_app_icon())
         self._tray.setToolTip("SnapTool - Screenshot Tool")
 
         menu = QMenu()

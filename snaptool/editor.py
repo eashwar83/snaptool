@@ -23,6 +23,7 @@ from PyQt6.QtGui import (
 
 from .config import Config
 from .capture import ScreenCapture
+from .icons import create_app_icon
 
 
 # ── Icon factory ──────────────────────────────────────────────────────
@@ -414,6 +415,7 @@ class AnnotationEditor(QMainWindow):
         self._pen_width = self.config.get("editor_width", 3)
 
         self.setWindowTitle("SnapTool - Editor")
+        self.setWindowIcon(create_app_icon())
         self.setMinimumSize(800, 600)
         self._build_ui()
         self._apply_style()

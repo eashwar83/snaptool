@@ -14,6 +14,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QColor
 
 from .config import Config
+from .icons import create_app_icon
 
 
 class SettingsDialog(QDialog):
@@ -21,6 +22,7 @@ class SettingsDialog(QDialog):
         super().__init__(parent)
         self.config = Config.instance()
         self.setWindowTitle("SnapTool - Settings")
+        self.setWindowIcon(create_app_icon())
         self.setMinimumWidth(500)
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
         self._build_ui()

@@ -12,6 +12,7 @@ from PyQt6.QtGui import QPixmap, QFont, QIcon
 
 from .config import Config
 from .capture import ScreenCapture
+from .icons import create_app_icon
 
 
 class SaveDialog(QDialog):
@@ -27,6 +28,7 @@ class SaveDialog(QDialog):
         self.saved_path = None
 
         self.setWindowTitle("SnapTool - Screenshot Captured")
+        self.setWindowIcon(create_app_icon())
         self.setWindowFlags(
             Qt.WindowType.WindowStaysOnTopHint
             | Qt.WindowType.Dialog

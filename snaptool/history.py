@@ -13,6 +13,7 @@ from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QPixmap, QFont, QIcon
 
 from .config import Config
+from .icons import create_app_icon
 
 
 class HistoryDialog(QDialog):
@@ -20,6 +21,7 @@ class HistoryDialog(QDialog):
         super().__init__(parent)
         self.config = Config.instance()
         self.setWindowTitle("SnapTool - Screenshot History")
+        self.setWindowIcon(create_app_icon())
         self.setMinimumSize(700, 500)
         self._build_ui()
         self._apply_style()
